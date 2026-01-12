@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>QuizMaster</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #fffaf7;
+}
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+}
+.correct { color: green; font-weight: bold; }
+.incorrect { color: red; font-weight: bold; }
+.score {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  background: #e6ffe6;
+  padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 style="color:#800000;text-align:center;">QuizMaster</h1>
+<p style="text-align:center;">Pattao National High School</p>
+
+<p><b>Teacher Name:</b><br>
+<input type="text" id="teacher" style="width:100%;"></p>
+
+<p><b>Subject:</b><br>
+<input type="text" id="subject" style="width:100%;"></p>
+
+<p><b>Student Name:</b><br>
+<input type="text" id="student" style="width:100%;"></p>
+
+<hr>
+
+<form id="quiz"></form>
+
+<button onclick="submitQuiz()" style="width:100%;padding:10px;background:#800000;color:white;">
+Submit Answers
+</button>
+
+<div id="scoreBox" class="score"></div>
+
+</div>
+
+<script>
+var questions = [
+["Which planet is known as the Red Planet?",["Earth","Mars","Jupiter","Venus"],1],
+["What gas do plants absorb?",["Oxygen","Nitrogen","Carbon dioxide","Hydrogen"],2],
+["Which part controls voluntary actions?",["Heart","Lungs","Brain","Liver"],2],
+["Boiling point of water?",["50°C","75°C","100°C","150°C"],2],
+["Vitamin from sunlight?",["A","B","C","D"],3],
+["Force pulling objects to Earth?",["Magnetism","Friction","Gravity","Pressure"],2],
+["Basic unit of life?",["Tissue","Organ","Cell","System"],2],
+["Liquid metal at room temp?",["Iron","Mercury","Aluminum","Copper"],1],
+["Organ for breathing?",["Kidney","Stomach","Heart","Lungs"],3],
+["Plant part that makes food?",["Root","Stem","Flower","Leaf"],3]
+];
+
+var quizDiv = document.getElementById("quiz");
+
+for (var i=0; i<questions.length; i++) {
+  quizDiv.innerHTML += "<p><b>"+(i+1)+". "+questions[i][0]+"</b></p>";
+  for (var j=0; j<questions[i][1].length; j++) {
+    quizDiv.innerHTML +=
+      "<label><input type='radio' name='q"+i+"' value='"+j+"'> "+
+      questions[i][1][j]+"</label><br>";
+  }
+}
+
+function submitQuiz() {
+  var teacher = document.getElementById("teacher").value.trim();
+  var subject = document.getElementById("subject").value.trim();
+  var student = document.getElementById("student").value.trim();
+
+  if (teacher=="" || subject=="" || student=="") {
+    alert("Please fill in Teacher, Subject, and Student Name.");
+    return;
+  }
+
+  var score = 0;
+
+  for (var i=0; i<questions.length; i++) {
+    var radios = document.getElementsByName("q"+i);
+    for (var j=0; j<radios.length; j++) {
+      if (radios[j].checked) {
+        if (j == questions[i][2]) {
+          score++;
+          radios[j].parentNode.className = "correct";
+        } else {
+          radios[j].parentNode.className = "incorrect";
+        }
+      }
+    }
+  }
+
+  document.getElementById("scoreBox").innerHTML =
+    "Score: " + score + " / " + questions.length;
+
+  // Save result
+  var results = JSON.parse(localStorage.getItem("quizResults")) || [];
+  results.push({
+    teacher: teacher,
+    subject: subject,
+    student: student,
+    score: score,
+    date: new Date().toLocaleString()
+  });
+  localStorage.setItem("quizResults", JSON.stringify(results));
+}
+</script>
+
+</body>
+</html>
